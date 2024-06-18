@@ -1,2 +1,3 @@
 # OWFasterLoadAssetBundles
- port of BepInExFasterLoadAssetBundles for outer wilds
+
+A port of https://github.com/DiFFoZ/BepInExFasterLoadAssetBundles for Outer Wilds
