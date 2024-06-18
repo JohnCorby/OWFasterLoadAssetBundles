@@ -8,10 +8,13 @@ namespace OWFasterLoadAssetBundles;
 public class OWFasterLoadAssetBundles : ModBehaviour
 {
 	public static OWFasterLoadAssetBundles Instance;
+	public static Harmony Harmony;
 
 	public void Awake()
 	{
 		Instance = this;
-		Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+		Harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+
+		Patcher.ChainloaderInitialized(); // lol just call it manually there are no chain smokers here
 	}
 }

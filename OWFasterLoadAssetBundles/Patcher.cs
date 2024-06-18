@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using OWFasterLoadAssetBundles.Helpers;
 using OWFasterLoadAssetBundles.Managers;
+using OWML.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -10,17 +11,13 @@ namespace OWFasterLoadAssetBundles;
 [HarmonyPatch]
 internal static class Patcher
 {
-    internal static ManualLogSource Logger { get; private set; } = null!;
     internal static AssetBundleManager AssetBundleManager { get; private set; } = null!;
     internal static MetadataManager MetadataManager { get; private set; } = null!;
 
-    [HarmonyPatch(typeof(Chainloader), nameof(Chainloader.Initialize))]
-    [HarmonyPostfix]
     public static void ChainloaderInitialized()
     {
         // BepInEx is ready to load plugins, patching Unity assetbundles
         AsyncHelper.InitUnitySynchronizationContext();
-        Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(BepInExFasterLoadAssetBundlesPatcher));
 
         var dataPath = new DirectoryInfo(Application.dataPath).Parent.FullName;
         var outputFolder = Path.Combine(dataPath, "Cache", "AssetBundles");
@@ -38,7 +35,7 @@ internal static class Patcher
     private static void Patch()
     {
         var thisType = typeof(Patcher);
-        var harmony = BepInExFasterLoadAssetBundlesPatcher.Harmony;
+        var harmony = OWFasterLoadAssetBundles.Harmony;
         var allBinding = AccessTools.all;
 
         // file
@@ -85,7 +82,7 @@ internal static class Patcher
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Failed to decompress assetbundle\n{ex}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to decompress assetbundle\n{ex}", MessageType.Error);
         }
     }
 
@@ -121,7 +118,7 @@ internal static class Patcher
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Failed to decompress assetbundle\n{ex}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to decompress assetbundle\n{ex}", MessageType.Error);
         }
 
         stream.Position = previousPosition;
