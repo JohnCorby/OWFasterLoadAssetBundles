@@ -90,7 +90,7 @@ internal static class Patcher
     {
         if (HandleStreamBundle(stream, out var path))
         {
-            __result = AssetBundle.LoadFromFile_Internal(path, 0, 0);
+            __result = Traverse.Create<AssetBundle>().Method("LoadFromFile_Internal").GetValue<AssetBundle>(path, 0, 0);
             return false;
         }
         
@@ -101,7 +101,7 @@ internal static class Patcher
     {
         if (HandleStreamBundle(stream, out var path))
         {
-            __result = AssetBundle.LoadFromFileAsync_Internal(path, 0, 0);
+            __result = Traverse.Create<AssetBundle>().Method("LoadFromFileAsync_Internal").GetValue<AssetBundleCreateRequest>(path, 0, 0);
             return false;
         }
         

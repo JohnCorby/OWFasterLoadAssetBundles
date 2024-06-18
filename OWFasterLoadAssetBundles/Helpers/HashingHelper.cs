@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OWML.Utils;
+using System;
 using System.Buffers.Binary;
 using System.Globalization;
 using System.IO;
@@ -30,8 +31,8 @@ internal class HashingHelper
         }
 
         var hashArray = new byte[16];
-        BinaryPrimitives.WriteUInt64LittleEndian(hashArray, hash.u64_0);
-        BinaryPrimitives.WriteUInt64LittleEndian(hashArray.AsSpan()[8..], hash.u64_1);
+        BinaryPrimitives.WriteUInt64LittleEndian(hashArray, hash.GetValue<ulong>("u64_0"));
+        BinaryPrimitives.WriteUInt64LittleEndian(hashArray.AsSpan()[8..], hash.GetValue<ulong>("u64_1"));
 
         return hashArray;
     }
