@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BepInExFasterLoadAssetBundles.Helpers;
+namespace OWFasterLoadAssetBundles.Helpers;
 internal static class DriveHelper
 {
     public static bool HasDriveSpaceOnPath(string path, long expectedSpaceGB)

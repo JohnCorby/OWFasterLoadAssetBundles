@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OWFasterLoadAssetBundles.Helpers;
+using OWFasterLoadAssetBundles.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using BepInExFasterLoadAssetBundles.Helpers;
-using BepInExFasterLoadAssetBundles.Models;
-using Newtonsoft.Json;
 
-namespace BepInExFasterLoadAssetBundles.Managers;
+namespace OWFasterLoadAssetBundles.Managers;
 internal class MetadataManager
 {
     private readonly string m_MetadataFile;

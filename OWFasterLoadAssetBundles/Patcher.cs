@@ -1,14 +1,12 @@
-﻿using System;
+﻿using HarmonyLib;
+using OWFasterLoadAssetBundles.Helpers;
+using OWFasterLoadAssetBundles.Managers;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using BepInEx.Bootstrap;
-using BepInEx.Logging;
-using BepInExFasterLoadAssetBundles.Helpers;
-using BepInExFasterLoadAssetBundles.Managers;
-using HarmonyLib;
 using UnityEngine;
 
-namespace BepInExFasterLoadAssetBundles;
+namespace OWFasterLoadAssetBundles;
 [HarmonyPatch]
 internal static class Patcher
 {

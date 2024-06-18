@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Buffers;
 using System.Buffers.Binary;
 using System.Globalization;
 using System.IO;
 using Unity.Collections;
 using UnityEngine;
 
-namespace BepInExFasterLoadAssetBundles.Helpers;
+namespace OWFasterLoadAssetBundles.Helpers;
 internal class HashingHelper
 {
     private const int c_BufferSize = 4096;

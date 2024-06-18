@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace BepInExFasterLoadAssetBundles.Helpers;
+namespace OWFasterLoadAssetBundles.Helpers;
 internal static class AsyncHelper
 {
     private static UnitySynchronizationContext s_SynchronizationContext = null!;

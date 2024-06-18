@@ -1,14 +1,14 @@
-﻿using System;
+﻿using OWFasterLoadAssetBundles.Helpers;
+using OWFasterLoadAssetBundles.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using BepInExFasterLoadAssetBundles.Helpers;
-using BepInExFasterLoadAssetBundles.Models;
 using UnityEngine;
 
-namespace BepInExFasterLoadAssetBundles.Managers;
+namespace OWFasterLoadAssetBundles.Managers;
 internal class AssetBundleManager
 {
     private readonly ConcurrentQueue<WorkAsset> m_WorkAssets = new();
