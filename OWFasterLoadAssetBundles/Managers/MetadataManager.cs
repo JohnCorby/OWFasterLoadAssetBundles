@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OWFasterLoadAssetBundles.Helpers;
 using OWFasterLoadAssetBundles.Models;
+using OWML.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,7 +92,7 @@ internal class MetadataManager
         }
         catch (Exception ex)
         {
-            Patcher.Logger.LogError($"Failed to deserialize metadata.json file\n{ex}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to deserialize metadata.json file\n{ex}", MessageType.Error);
             m_Metadata = [];
             return;
         }
@@ -156,7 +157,7 @@ internal class MetadataManager
                 continue;
             }
 
-            Patcher.Logger.LogInfo($"Deleting unused asset bundle cache {metadata.UncompressedAssetBundleName}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Deleting unused asset bundle cache {metadata.UncompressedAssetBundleName}", MessageType.Info);
             Patcher.AssetBundleManager.DeleteCachedAssetBundle(Path.Combine(Patcher.AssetBundleManager.CachePath, metadata.UncompressedAssetBundleName));
         }
 
@@ -176,14 +177,14 @@ internal class MetadataManager
 
         if (deletedBundleCount > 0)
         {
-            Patcher.Logger.LogWarning($"Deleted {deletedBundleCount} unknown bundles. Metadata file got corrupted?");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Deleted {deletedBundleCount} unknown bundles. Metadata file got corrupted?", MessageType.Warning);
         }
 
         static void DeleteFileSafely(ref int counter, string path)
         {
             if (!FileHelper.TryDeleteFile(path, out var exception))
             {
-                Patcher.Logger.LogWarning($"Failed to delete cache\n{exception}");
+                OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to delete cache\n{exception}", MessageType.Warning);
                 return;
             }
 

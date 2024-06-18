@@ -56,10 +56,10 @@ internal static class Patcher
         }
 
         // streams
-        harmony.Patch(AccessTools.Method(assetBundleType, nameof(AssetBundle.LoadFromStreamInternal)),
+        harmony.Patch(AccessTools.Method(assetBundleType, "LoadFromStreamInternal"),
             prefix: new(thisType.GetMethod(nameof(LoadAssetBundleFromStreamFast), allBinding)));
 
-        harmony.Patch(AccessTools.Method(assetBundleType, nameof(AssetBundle.LoadFromStreamAsyncInternal)),
+        harmony.Patch(AccessTools.Method(assetBundleType, "LoadFromStreamAsyncInternal"),
             prefix: new(thisType.GetMethod(nameof(LoadAssetBundleFromStreamAsyncFast), allBinding)));
     }
 
@@ -108,7 +108,7 @@ internal static class Patcher
         return true;
     }
 
-    private static bool HandleStreamBundle(Stream stream, [NotNullWhen(true)] out string? path)
+    private static bool HandleStreamBundle(Stream stream, out string? path)
     {
         var previousPosition = stream.Position;
 

@@ -1,5 +1,6 @@
 ﻿using OWFasterLoadAssetBundles.Helpers;
 using OWFasterLoadAssetBundles.Models;
+using OWML.Common;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -55,19 +56,19 @@ internal class AssetBundleManager
         }
         catch (Exception ex)
         {
-            Patcher.Logger.LogError($"Failed to delete temp files\n{ex}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to delete temp files\n{ex}", MessageType.Error);
         }
 
         if (count > 0)
         {
-            Patcher.Logger.LogWarning($"Deleted {count} temp files");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Deleted {count} temp files", MessageType.Warning);
         }
 
         static void DeleteFileSafely(ref int count, string tempFile)
         {
             if (!FileHelper.TryDeleteFile(tempFile, out var exception))
             {
-                Patcher.Logger.LogError($"Failed to delete temp file\n{exception}");
+                OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to delete temp file\n{exception}", MessageType.Error);
                 return;
             }
 
@@ -75,11 +76,11 @@ internal class AssetBundleManager
         }
     }
 
-    public bool TryRecompressAssetBundle(Stream stream, [NotNullWhen(true)] out string? path)
+    public bool TryRecompressAssetBundle(Stream stream, out string? path)
     {
         if (BundleHelper.CheckBundleIsAlreadyDecompressed(stream))
         {
-            Patcher.Logger.LogInfo("Original bundle is already uncompressed, using it instead");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Original bundle is already uncompressed, using it instead", MessageType.Info);
             path = null;
             return false;
         }
@@ -95,7 +96,7 @@ internal class AssetBundleManager
                 return true;
             }
 
-            Patcher.Logger.LogDebug("Found assetbundle metadata, but path was null. Probably bundle is already uncompressed!");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Found assetbundle metadata, but path was null. Probably bundle is already uncompressed!", MessageType.Debug);
             return false;
         }
 
@@ -128,7 +129,7 @@ internal class AssetBundleManager
         FileHelper.TryDeleteFile(path, out var fileException);
         if (fileException != null)
         {
-            Patcher.Logger.LogError($"Failed to delete uncompressed assetbundle\n{fileException}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to delete uncompressed assetbundle\n{fileException}", MessageType.Error);
         }
     }
 
@@ -156,12 +157,12 @@ internal class AssetBundleManager
         var newPath = Path.Combine(CachePath, metadata.UncompressedAssetBundleName);
         if (!File.Exists(newPath))
         {
-            Patcher.Logger.LogWarning($"Failed to find decompressed assetbundle at \"{newPath}\". Probably it was deleted?");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to find decompressed assetbundle at \"{newPath}\". Probably it was deleted?", MessageType.Warning);
             Patcher.MetadataManager.DeleteMetadata(metadata);
             return false;
         }
 
-        Patcher.Logger.LogDebug($"Loading uncompressed bundle \"{metadata.UncompressedAssetBundleName}\"");
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Loading uncompressed bundle \"{metadata.UncompressedAssetBundleName}\"", MessageType.Debug);
         path = newPath;
 
         metadata.LastAccessTime = DateTime.Now;
@@ -179,14 +180,14 @@ internal class AssetBundleManager
 
         if (DriveHelper.HasDriveSpaceOnPath(CachePath, 10))
         {
-            Patcher.Logger.LogDebug($"Queued recompress of \"{Path.GetFileName(workAsset.Path)}\" assetbundle");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Queued recompress of \"{Path.GetFileName(workAsset.Path)}\" assetbundle", MessageType.Debug);
 
             m_WorkAssets.Enqueue(workAsset);
             StartRunner();
             return;
         }
 
-        Patcher.Logger.LogWarning($"Ignoring request of decompressing, because the free drive space is less than 10GB");
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Ignoring request of decompressing, because the free drive space is less than 10GB", MessageType.Warning);
         return;
     }
 
@@ -247,7 +248,7 @@ internal class AssetBundleManager
             _ => BuildCompression.LZ4Runtime,
         };
 
-        Patcher.Logger.LogDebug($"Decompressing \"{originalFileName}\" with compression type {workAsset.CompressionType}");
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Decompressing \"{originalFileName}\" with compression type {workAsset.CompressionType}", MessageType.Debug);
 
         // when loading assetbundle async via stream, the file can be still in use. Wait a bit for that
         await FileHelper.RetryUntilFileIsClosedAsync(workAsset.Path, 5);
@@ -272,17 +273,17 @@ internal class AssetBundleManager
             FileHelper.TryDeleteFile(workAsset.Path, out _);
         }
 
-        Patcher.Logger.LogDebug($"Result of decompression \"{originalFileName}\": {result} ({success}), {humanReadableResult}");
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Result of decompression \"{originalFileName}\": {result} ({success}), {humanReadableResult}", MessageType.Debug);
         if (result is not AssetBundleLoadResult.Success || !success)
         {
-            Patcher.Logger.LogWarning($"Failed to decompress a assetbundle at \"{workAsset.Path}\"\nResult: {result}, {humanReadableResult}");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to decompress a assetbundle at \"{workAsset.Path}\"\nResult: {result}, {humanReadableResult}", MessageType.Warning);
             return;
         }
 
         // check if unity returned the same assetbundle (means that assetbundle is already decompressed)
         if (workAsset.Hash.AsSpan().SequenceEqual(newHash))
         {
-            Patcher.Logger.LogDebug($"Assetbundle \"{originalFileName}\" is already uncompressed, adding to ignore list");
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Assetbundle \"{originalFileName}\" is already uncompressed, adding to ignore list", MessageType.Debug);
 
             metadata.ShouldNotDecompress = true;
             Patcher.MetadataManager.SaveMetadata(metadata);
@@ -291,7 +292,7 @@ internal class AssetBundleManager
             return;
         }
 
-        Patcher.Logger.LogDebug($"Assetbundle \"{originalFileName}\" is now uncompressed!");
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Assetbundle \"{originalFileName}\" is now uncompressed!", MessageType.Debug);
 
         metadata.UncompressedAssetBundleName = outputName;
         Patcher.MetadataManager.SaveMetadata(metadata);

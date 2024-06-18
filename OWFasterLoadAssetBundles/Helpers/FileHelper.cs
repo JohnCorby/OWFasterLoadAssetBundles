@@ -9,7 +9,7 @@ internal static class FileHelper
     public const long c_GBToBytes = 1024 * 1024 * 1024;
     public const long c_MBToBytes = 1024 * 1024;
 
-    public static bool TryDeleteFile(string path, [NotNullWhen(false)] out Exception? exception)
+    public static bool TryDeleteFile(string path, out Exception? exception)
     {
         try
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OWML.Common;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,12 +8,12 @@ using UnityEngine;
 namespace OWFasterLoadAssetBundles.Helpers;
 internal static class AsyncHelper
 {
-    private static UnitySynchronizationContext s_SynchronizationContext = null!;
+    private static SynchronizationContext s_SynchronizationContext = null!;
     private static int s_MainThreadId = -1;
 
     public static void InitUnitySynchronizationContext()
     {
-        s_SynchronizationContext = (UnitySynchronizationContext)SynchronizationContext.Current;
+        s_SynchronizationContext = SynchronizationContext.Current;
         s_MainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
@@ -26,7 +27,7 @@ internal static class AsyncHelper
             }
             catch (Exception ex)
             {
-                Patcher.Logger.LogError(ex);
+                OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine(ex.ToString(), MessageType.Error);
             }
         });
     }
