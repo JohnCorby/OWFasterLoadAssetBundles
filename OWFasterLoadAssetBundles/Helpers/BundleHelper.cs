@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HarmonyLib;
+using OWML.Common;
+using System;
 using System.Buffers.Binary;
 using System.IO;
 
@@ -19,11 +21,14 @@ internal static class BundleHelper
         SkipString(stream); // skip web min rev
         stream.Position += 8 + 4 + 4; // skip size, compressed block size, uncompressed block size
 
-        Span<byte> buffer = stackalloc byte[4];
-        stream.Read(buffer);
+        var buffer = new byte[4];
+        stream.Read(buffer, 0, 4);
 
         var flags = BinaryPrimitives.ReadInt32BigEndian(buffer);
         var compressionType = flags & 0x3f;
+
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Bundle has compression type {buffer.Join()} - {compressionType}", MessageType.Info);
+
 
         // 0 - none (uncompressed)
         // 1 - LZMA

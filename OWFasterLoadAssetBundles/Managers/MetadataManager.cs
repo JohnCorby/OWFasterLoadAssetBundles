@@ -5,6 +5,7 @@ using OWML.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace OWFasterLoadAssetBundles.Managers;
 internal class MetadataManager
@@ -29,7 +30,8 @@ internal class MetadataManager
             foreach (var metadata in m_Metadata)
             {
                 var writtenBytes = HashingHelper.WriteHash(tempHash, metadata.OriginalAssetBundleHash);
-                if (tempHash[..writtenBytes].SequenceEqual(hash))
+                var writtenRange = tempHash.ToArray().Take(writtenBytes).ToArray().AsSpan();
+                if (writtenRange.SequenceEqual(hash))
                 {
                     return metadata;
                 }
@@ -82,18 +84,18 @@ internal class MetadataManager
     {
         if (!File.Exists(m_MetadataFile))
         {
-            m_Metadata = [];
+            m_Metadata = new();
             return;
         }
 
         try
         {
-            m_Metadata = JsonConvert.DeserializeObject<List<Metadata>>(File.ReadAllText(m_MetadataFile)) ?? [];
+            m_Metadata = JsonConvert.DeserializeObject<List<Metadata>>(File.ReadAllText(m_MetadataFile)) ?? new();
         }
         catch (Exception ex)
         {
             OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Failed to deserialize metadata.json file\n{ex}", MessageType.Error);
-            m_Metadata = [];
+            m_Metadata = new();
             return;
         }
 

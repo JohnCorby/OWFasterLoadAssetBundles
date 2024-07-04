@@ -173,8 +173,12 @@ internal class AssetBundleManager
 
     private void RecompressAssetBundleInternal(WorkAsset workAsset)
     {
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Recompressing asset bundle internal path: {workAsset.Path}", MessageType.Info);
+
         if (!File.Exists(workAsset.Path))
         {
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"File does not exist at: {workAsset.Path}", MessageType.Error);
+
             return;
         }
 

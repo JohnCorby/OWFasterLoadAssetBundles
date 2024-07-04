@@ -5,6 +5,9 @@ using System.Globalization;
 using System.IO;
 using Unity.Collections;
 using UnityEngine;
+using System.Linq;
+using System.Text;
+using OWML.Common;
 
 namespace OWFasterLoadAssetBundles.Helpers;
 internal class HashingHelper
@@ -13,45 +16,44 @@ internal class HashingHelper
 
     public static byte[] HashFile(string path)
     {
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hashing file", MessageType.Info);
+
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None, c_BufferSize, FileOptions.SequentialScan);
         return HashStream(fileStream);
     }
 
     public static byte[] HashStream(Stream stream)
     {
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hashing stream", MessageType.Info);
+
         stream.Seek(0, SeekOrigin.Begin);
 
-        var hash = new Hash128();
+        var hash = new StringBuilder();
 
-        using var buffer = new NativeArray<byte>(c_BufferSize, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-        int readBytes;
-        while ((readBytes = stream.Read(buffer)) > 0)
+        var buffer = new byte[4];
+        while (stream.Read(buffer, 0, 4) > 0)
         {
-            hash.Append(buffer, 0, readBytes);
+            hash.Append(buffer);
         }
 
         var hashArray = new byte[16];
         BinaryPrimitives.WriteUInt64LittleEndian(hashArray, hash.GetValue<ulong>("u64_0"));
-        BinaryPrimitives.WriteUInt64LittleEndian(hashArray.AsSpan()[8..], hash.GetValue<ulong>("u64_1"));
+        BinaryPrimitives.WriteUInt64LittleEndian(hashArray.Skip(8).ToArray().AsSpan(), hash.GetValue<ulong>("u64_1"));
 
         return hashArray;
     }
 
     public static string HashToString(Span<byte> hash)
     {
-        Span<char> chars = stackalloc char[hash.Length * 2];
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hash to string", MessageType.Info);
 
-        for (var i = 0; i < hash.Length; i++)
-        {
-            var b = hash[i];
-            b.TryFormat(chars[(i * 2)..], out _, "X2", CultureInfo.InvariantCulture);
-        }
-
-        return chars.ToString();
+        return BitConverter.ToString(hash.ToArray()).Replace("-", "");
     }
 
     public static int WriteHash(Span<byte> destination, string hash)
     {
+        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Writing hash", MessageType.Info);
+
         if ((hash.Length / 2) > destination.Length)
         {
             throw new ArgumentOutOfRangeException("Destination is small to write hash", nameof(destination));
@@ -59,7 +61,7 @@ internal class HashingHelper
 
         for (var i = 0; i < hash.Length; i += 2)
         {
-            var s = hash.AsSpan(i, 2);
+            var s = hash.Skip(i).Take(2).ToArray().ToString();
             destination[i / 2] = byte.Parse(s, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         }
 

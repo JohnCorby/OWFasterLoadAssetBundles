@@ -42,16 +42,16 @@ internal static class Patcher
         var patchMethod = new HarmonyMethod(thisType.GetMethod(nameof(LoadAssetBundleFromFileFast), allBinding));
         var assetBundleType = typeof(AssetBundle);
 
-        string[] loadNames = [nameof(AssetBundle.LoadFromFile), nameof(AssetBundle.LoadFromFileAsync)];
+        string[] loadNames = new string[] { nameof(AssetBundle.LoadFromFile), nameof(AssetBundle.LoadFromFileAsync) };
         foreach (var loadName in loadNames)
         {
-            harmony.Patch(AccessTools.Method(assetBundleType, loadName, [typeof(string)]),
+            harmony.Patch(AccessTools.Method(assetBundleType, loadName, new Type[] { typeof(string) }),
                 prefix: patchMethod);
 
-            harmony.Patch(AccessTools.Method(assetBundleType, loadName, [typeof(string), typeof(uint)]),
+            harmony.Patch(AccessTools.Method(assetBundleType, loadName, new Type[] { typeof(string), typeof(uint) }),
                prefix: patchMethod);
 
-            harmony.Patch(AccessTools.Method(assetBundleType, loadName, [typeof(string), typeof(uint), typeof(ulong)]),
+            harmony.Patch(AccessTools.Method(assetBundleType, loadName, new Type[] { typeof(string), typeof(uint), typeof(ulong) }),
                prefix: patchMethod);
         }
 
