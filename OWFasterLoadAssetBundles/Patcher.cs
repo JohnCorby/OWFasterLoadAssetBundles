@@ -65,6 +65,12 @@ internal static class Patcher
 
     private static void LoadAssetBundleFromFileFast(ref string path)
     {
+        if (path.Contains("Outer Wilds/OuterWilds_Data/StreamingAssets"))
+        {
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Skipping guy {path}", MessageType.Info);
+            return;
+        }
+
         // mod trying to load assetbundle at null path, buh
         if (string.IsNullOrEmpty(path))
         {

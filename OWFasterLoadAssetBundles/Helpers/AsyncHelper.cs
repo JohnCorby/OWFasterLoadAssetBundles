@@ -19,7 +19,7 @@ internal static class AsyncHelper
 
     public static void Schedule(Func<Task> func)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -29,7 +29,7 @@ internal static class AsyncHelper
             {
                 OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine(ex.ToString(), MessageType.Error);
             }
-        });
+        }).Wait();
     }
 
     public static SwitchToMainThreadAwaiter SwitchToMainThread() => new();
