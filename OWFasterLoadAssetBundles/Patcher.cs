@@ -67,7 +67,7 @@ internal static class Patcher
     {
         if (path.Contains("Outer Wilds/OuterWilds_Data/StreamingAssets"))
         {
-            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Skipping guy {path}", MessageType.Info);
+            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Skipping base game bundle {path}", MessageType.Info);
             return;
         }
 

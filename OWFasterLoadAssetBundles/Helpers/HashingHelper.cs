@@ -16,16 +16,12 @@ internal class HashingHelper
 
     public static byte[] HashFile(string path)
     {
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hashing file", MessageType.Info);
-
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None, c_BufferSize, FileOptions.SequentialScan);
         return HashStream(fileStream);
     }
 
     public static byte[] HashStream(Stream stream)
-    {
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hashing stream", MessageType.Info);
-                                                   
+    {                                                  
         stream.Seek(0, SeekOrigin.Begin);
 
         var hash = new StringBuilder();
@@ -38,15 +34,11 @@ internal class HashingHelper
             hash.Append(b.ToString("X2"));
         }
 
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("done hashing stream", MessageType.Info);
-
         return BitConverter.GetBytes(hash.ToString().GetHashCode());
     }
 
     public static string HashToString(Span<byte> hash)
     {
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Hash to string", MessageType.Info);
-
         Span<char> chars = stackalloc char[hash.Length * 2];
 
         for (var i = 0; i < hash.Length; i++)
@@ -55,19 +47,13 @@ internal class HashingHelper
             var s = b.ToString("X2").ToCharArray();
             chars[i * 2] = s[0];
             chars[i * 2 + 1] = s[1];
-            OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"{s}", MessageType.Info);
-
         }
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"oh boy im done also the length is {hash.Length}", MessageType.Info);
-
 
         return new string(chars.ToArray());
     }
 
     public static int WriteHash(Span<byte> destination, string hash)
     {
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Writing hash", MessageType.Info);
-
         if ((hash.Length / 2) > destination.Length)
         {
             throw new ArgumentOutOfRangeException("Destination is small to write hash", nameof(destination));

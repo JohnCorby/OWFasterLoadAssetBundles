@@ -78,9 +78,6 @@ internal class AssetBundleManager
 
     public bool TryRecompressAssetBundle(Stream stream, out string? path)
     {
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Try recompress bundle", MessageType.Info);
-
-
         if (BundleHelper.CheckBundleIsAlreadyDecompressed(stream))
         {
             OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine("Original bundle is already uncompressed, using it instead", MessageType.Info);
@@ -89,8 +86,6 @@ internal class AssetBundleManager
         }
 
         var hash = HashingHelper.HashStream(stream);
-
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"What the hash doing {string.Join(", ", hash)}", MessageType.Info);
 
         path = null!;
         if (FindCachedBundleByHash(hash, out var newPath))
@@ -226,8 +221,6 @@ internal class AssetBundleManager
         {
             while (m_WorkAssets.TryDequeue(out var work))
             {
-                OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Dequeing work guy", MessageType.Info);
-
                 await DecompressAssetBundleAsync(work);
             }
         }
@@ -241,7 +234,6 @@ internal class AssetBundleManager
                 }
             }
         }
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"done all work guy", MessageType.Info);
     }
 
     private async Task DecompressAssetBundleAsync(WorkAsset workAsset)
@@ -251,7 +243,6 @@ internal class AssetBundleManager
             OriginalAssetBundleHash = HashingHelper.HashToString(workAsset.Hash),
             LastAccessTime = DateTime.Now,
         };
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"The", MessageType.Info);
 
         var originalFileName = Path.GetFileNameWithoutExtension(workAsset.Path);
         var outputName = originalFileName + '_' + metadata.GetHashCode() + ".assetbundle";
@@ -269,28 +260,20 @@ internal class AssetBundleManager
 
         OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"\"{originalFileName}\" no longer in use if it was", MessageType.Info);
 
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"On main thread", MessageType.Info);
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"recompress {workAsset.Path} to {outputPath}", MessageType.Info);
-
         var op = AssetBundle.RecompressAssetBundleAsync(workAsset.Path, outputPath,
             buildCompression, 0, ThreadPriority.Normal);
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"wait for recompress", MessageType.Info);
 
         while(!op.isDone)
         {
             OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Progress: {op.progress}", MessageType.Info);
-            await Task.Delay(500);
+            await Task.Delay(100);
         }
-
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Done recompress", MessageType.Info);
-
 
         // we are in main thread, load results locally to make unity happy
         var result = op.result;
         var humanReadableResult = op.humanReadableResult;
         var success = op.success;
         var newHash = HashingHelper.HashFile(outputPath);
-
 
         // delete temp bundle if needed
         if (workAsset.DeleteBundleAfterOperation)

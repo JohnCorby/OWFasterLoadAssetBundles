@@ -27,9 +27,6 @@ internal static class BundleHelper
         var flags = BinaryPrimitives.ReadInt32BigEndian(buffer);
         var compressionType = flags & 0x3f;
 
-        OWFasterLoadAssetBundles.Instance.ModHelper.Console.WriteLine($"Bundle has compression type {buffer.Join()} - {compressionType}", MessageType.Info);
-
-
         // 0 - none (uncompressed)
         // 1 - LZMA
         // 2 - LZ4
